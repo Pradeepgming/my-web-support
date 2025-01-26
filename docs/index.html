@@ -390,6 +390,50 @@
             transform: none;
         }
         
+        .preview-container {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .preview-container.show {
+            display: block;
+        }
+        
+        .game-container {
+            width: 100%;
+            height: 500px;
+            border: none;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: white;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 10px;
+        }
+        
+        .step {
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border-radius: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .step.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .step.completed {
+            background: var(--secondary-color);
+            color: white;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -409,11 +453,17 @@
     <div class="container">
         <h1>My Web Support</h1>
         
+        <div class="step-indicator">
+            <div class="step active" id="step1">1. Upload Files</div>
+            <div class="step" id="step2">2. Accept Files</div>
+            <div class="step" id="step3">3. View Result</div>
+        </div>
+        
         <div class="upload-section">
             <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
                 <i class="fas fa-cloud-upload-alt"></i> Upload Files
             </button>
-            <input type="file" id="fileInput" style="display: none" multiple accept=".zip,.html,.txt,.js,.css,.xml,.json">
+            <input type="file" id="fileInput" style="display: none" multiple accept=".zip,.html,.txt,.js,.css,.xml,.json,.htm">
             
             <div class="upload-progress">
                 <div class="progress-bar">
@@ -423,18 +473,7 @@
             
             <div class="upload-result">
                 <div class="result-card">
-                    <div class="result-title">Your files are ready!</div>
-                    <div class="result-links">
-                        <a href="#" class="result-link view-link" target="_blank">
-                            <i class="fas fa-eye"></i> View Website
-                        </a>
-                        <a href="#" class="result-link download-link" download>
-                            <i class="fas fa-download"></i> Download Files
-                        </a>
-                        <button class="result-link copy-link" onclick="copyWebsiteLink()">
-                            <i class="fas fa-link"></i> Copy Link
-                        </button>
-                    </div>
+                    <div class="result-title">Files processed! Please accept to continue.</div>
                     <button class="accept-btn" onclick="acceptFiles()">
                         <i class="fas fa-check"></i> Accept Files
                     </button>
@@ -442,439 +481,224 @@
             </div>
         </div>
         
-        <div class="files-grid">
-            <div class="file-card">
-                <div class="file-icon">🌐</div>
-                <div class="file-name">Balloon Prick Game</div>
-                <div class="file-info">Interactive HTML5 Game</div>
-                <div class="file-actions">
-                    <button class="action-btn view-btn" onclick="window.open('files/game.html', '_blank')">
-                        <i class="fas fa-eye"></i> View
-                    </button>
-                    <button class="action-btn download-btn" onclick="window.location.href='files/game.html'" download>
-                        <i class="fas fa-download"></i> Download
-                    </button>
-                    <button class="action-btn copy-btn" onclick="copyLink('files/game.html')">
-                        <i class="fas fa-link"></i> Copy Link
-                    </button>
-                    <div class="copy-tooltip">Link copied!</div>
-                </div>
-            </div>
-            
-            <div class="file-card">
-                <div class="file-icon">📄</div>
-                <div class="file-name">activity_main.xml</div>
-                <div class="file-info">Android Layout File</div>
-                <div class="file-actions">
-                    <button class="action-btn view-btn" onclick="window.open('files/activity_main.xml', '_blank')">
-                        <i class="fas fa-eye"></i> View
-                    </button>
-                    <button class="action-btn download-btn" onclick="window.location.href='files/activity_main.xml'" download>
-                        <i class="fas fa-download"></i> Download
-                    </button>
-                    <button class="action-btn copy-btn" onclick="copyLink('files/activity_main.xml')">
+        <div id="previewContainer" class="preview-container">
+            <div class="result-card">
+                <div class="result-title">Your files are ready!</div>
+                <div class="result-links">
+                    <a href="#" class="result-link view-link" target="_blank">
+                        <i class="fas fa-eye"></i> View Website
+                    </a>
+                    <a href="#" class="result-link download-link" download>
+                        <i class="fas fa-download"></i> Download Files
+                    </a>
+                    <button class="result-link copy-link" onclick="copyWebsiteLink()">
                         <i class="fas fa-link"></i> Copy Link
                     </button>
                 </div>
             </div>
             
-            <div class="file-card">
-                <div class="file-icon">📄</div>
-                <div class="file-name">MainActivity.java</div>
-                <div class="file-info">Android Source Code</div>
-                <div class="file-actions">
-                    <button class="action-btn view-btn" onclick="window.open('files/MainActivity.java', '_blank')">
-                        <i class="fas fa-eye"></i> View
-                    </button>
-                    <button class="action-btn download-btn" onclick="window.location.href='files/MainActivity.java'" download>
-                        <i class="fas fa-download"></i> Download
-                    </button>
-                    <button class="action-btn copy-btn" onclick="copyLink('files/MainActivity.java')">
-                        <i class="fas fa-link"></i> Copy Link
-                    </button>
-                </div>
-            </div>
-            
-            <div class="file-card">
-                <div class="file-icon">📦</div>
-                <div class="file-name">Complete Package</div>
-                <div class="file-info">All Game Files (ZIP)</div>
-                <div class="file-actions">
-                    <button class="action-btn download-btn" onclick="window.location.href='files/game.zip'" download>
-                        <i class="fas fa-download"></i> Download
-                    </button>
-                    <button class="action-btn copy-btn" onclick="copyLink('files/game.zip')">
-                        <i class="fas fa-link"></i> Copy Link
-                    </button>
-                </div>
-            </div>
+            <div id="gamePreview" class="game-container"></div>
         </div>
-
-        <div class="preview-section">
-            <h2>Game Preview</h2>
-            <iframe src="files/game.html" class="preview-frame" title="Balloon Prick Game"
-                sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-                loading="lazy">
-            </iframe>
-        </div>
-    </div>
-    
-    <script>
-        // Function to create a downloadable HTML file
-        function createHtmlFile(title, content) {
-            const template = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${title}</title>
-    <style>
-        body {
-            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background: #f8f9fa;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 { color: #2c3e50; }
-        .file-list {
-            margin-top: 20px;
-            border: 1px solid #eee;
-            border-radius: 8px;
-        }
-        .file-item {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .file-item:last-child {
-            border-bottom: none;
-        }
-        .file-icon {
-            color: #3498db;
-            width: 24px;
-            text-align: center;
-        }
-        .file-name {
-            flex: 1;
-        }
-        pre {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 4px;
-            overflow-x: auto;
-            margin: 0;
-        }
-    </style>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container">
-        <h1>${title}</h1>
-        ${content}
-    </div>
-</body>
-</html>`;
-            return template;
-        }
-
-        // Function to get file icon based on extension
-        function getFileIcon(filename) {
-            const ext = filename.split('.').pop().toLowerCase();
-            const icons = {
-                'html': 'fab fa-html5',
-                'css': 'fab fa-css3-alt',
-                'js': 'fab fa-js',
-                'json': 'fas fa-code',
-                'xml': 'fas fa-code',
-                'txt': 'fas fa-file-alt',
-                'md': 'fas fa-file-alt',
-                'jpg': 'fas fa-image',
-                'jpeg': 'fas fa-image',
-                'png': 'fas fa-image',
-                'gif': 'fas fa-image',
-                'pdf': 'fas fa-file-pdf',
-                'zip': 'fas fa-file-archive',
-                'rar': 'fas fa-file-archive',
-                '7z': 'fas fa-file-archive',
-                'doc': 'fas fa-file-word',
-                'docx': 'fas fa-file-word',
-                'xls': 'fas fa-file-excel',
-                'xlsx': 'fas fa-file-excel',
-                'ppt': 'fas fa-file-powerpoint',
-                'pptx': 'fas fa-file-powerpoint'
-            };
-            return icons[ext] || 'fas fa-file';
-        }
-
-        // Function to handle ZIP file
-        async function handleZipFile(file) {
-            const zip = await JSZip.loadAsync(file);
-            const files = [];
-            
-            for (let filename in zip.files) {
-                if (!zip.files[filename].dir) {
-                    const content = await zip.files[filename].async('string');
-                    files.push({
-                        name: filename,
-                        content: content
-                    });
-                }
-            }
-            
-            return files;
-        }
-
-        // Function to create file list HTML
-        function createFileListHtml(files) {
-            let html = '<div class="file-list">';
-            files.forEach(file => {
-                const icon = getFileIcon(file.name);
-                html += `
-                    <div class="file-list-item">
-                        <div class="file-list-icon">
-                            <i class="${icon}"></i>
-                        </div>
-                        <div class="file-list-name">${file.name}</div>
-                        <div class="file-list-actions">
-                            <button class="file-list-btn view" onclick="previewFile('${file.name}')">
-                                <i class="fas fa-eye"></i> View
-                            </button>
-                            <button class="file-list-btn download" onclick="downloadFile('${file.name}')">
-                                <i class="fas fa-download"></i> Download
-                            </button>
-                        </div>
-                    </div>`;
-            });
-            html += '</div>';
-            return html;
-        }
-
-        // Function to handle file upload
-        async function handleFileUpload(files) {
-            const progressBar = document.querySelector('.upload-progress');
-            const progressFill = document.querySelector('.progress-fill');
-            const uploadResult = document.querySelector('.upload-result');
-            const acceptBtn = document.querySelector('.accept-btn');
-            
-            progressBar.style.display = 'block';
-            uploadResult.style.display = 'none';
-            
-            if (acceptBtn) {
-                acceptBtn.disabled = true;
-            }
-            
-            try {
-                const processedFiles = [];
-                
-                for (let i = 0; i < files.length; i++) {
-                    const file = files[i];
-                    const reader = new FileReader();
-                    
-                    await new Promise((resolve, reject) => {
-                        reader.onload = async (e) => {
-                            try {
-                                // Update progress
-                                const progress = ((i + 1) / files.length) * 100;
-                                progressFill.style.width = `${progress}%`;
-                                
-                                if (file.name.toLowerCase().endsWith('.zip')) {
-                                    // Handle ZIP file
-                                    const zipFiles = await handleZipFile(file);
-                                    processedFiles.push(...zipFiles);
-                                } else {
-                                    // Handle regular file
-                                    processedFiles.push({
-                                        name: file.name,
-                                        content: e.target.result
-                                    });
-                                }
-                                
-                                resolve();
-                            } catch (error) {
-                                reject(error);
-                            }
-                        };
-                        reader.onerror = reject;
-                        
-                        if (file.name.toLowerCase().endsWith('.zip')) {
-                            reader.readAsArrayBuffer(file);
-                        } else {
-                            reader.readAsText(file);
-                        }
-                    });
-                }
-                
-                // Create preview HTML
-                const fileListHtml = createFileListHtml(processedFiles);
-                const previewHtml = createHtmlFile('Uploaded Files', fileListHtml);
-                
-                // Create preview URL
-                const previewBlob = new Blob([previewHtml], { type: 'text/html' });
-                const previewUrl = URL.createObjectURL(previewBlob);
-                
-                // Update UI with links
-                const viewLink = document.querySelector('.view-link');
-                const downloadLink = document.querySelector('.download-link');
-                
-                viewLink.href = previewUrl;
-                viewLink.style.display = 'inline-flex';
-                
-                // Create ZIP with all files
-                const zip = new JSZip();
-                processedFiles.forEach(file => {
-                    zip.file(file.name, file.content);
+        
+        <script>
+            // Function to update step indicator
+            function updateSteps(currentStep) {
+                const steps = document.querySelectorAll('.step');
+                steps.forEach((step, index) => {
+                    step.classList.remove('active', 'completed');
+                    if (index + 1 < currentStep) {
+                        step.classList.add('completed');
+                    } else if (index + 1 === currentStep) {
+                        step.classList.add('active');
+                    }
                 });
+            }
+            
+            // Function to create HTML preview for a game file
+            function createGamePreview(content) {
+                const gameContainer = document.getElementById('gamePreview');
+                const iframe = document.createElement('iframe');
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+                iframe.style.border = 'none';
                 
-                const zipBlob = await zip.generateAsync({ type: 'blob' });
-                const zipUrl = URL.createObjectURL(zipBlob);
-                downloadLink.href = zipUrl;
-                downloadLink.download = 'files.zip';
+                // Create a blob URL for the game content
+                const blob = new Blob([content], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                iframe.src = url;
                 
-                // Show results
-                progressBar.style.display = 'none';
-                uploadResult.style.display = 'block';
+                // Clear previous content
+                gameContainer.innerHTML = '';
+                gameContainer.appendChild(iframe);
+            }
+
+            // Function to handle file upload
+            async function handleFileUpload(files) {
+                updateSteps(1);
+                const progressBar = document.querySelector('.upload-progress');
+                const progressFill = document.querySelector('.progress-fill');
+                const uploadResult = document.querySelector('.upload-result');
+                const previewContainer = document.getElementById('previewContainer');
+                const acceptBtn = document.querySelector('.accept-btn');
                 
-                // Store files in window for preview/download
-                window.uploadedFiles = processedFiles;
+                progressBar.style.display = 'block';
+                uploadResult.style.display = 'none';
+                previewContainer.classList.remove('show');
                 
-                // Enable accept button
-                if (acceptBtn) {
-                    acceptBtn.disabled = false;
-                }
-                
-            } catch (error) {
-                console.error('Error processing files:', error);
-                alert('Error processing files. Please try again.');
-                progressBar.style.display = 'none';
                 if (acceptBtn) {
                     acceptBtn.disabled = true;
                 }
-            }
-        }
-        
-        // Function to preview a specific file
-        function previewFile(filename) {
-            const file = window.uploadedFiles.find(f => f.name === filename);
-            if (file) {
-                const previewHtml = createHtmlFile(file.name, `<pre>${file.content}</pre>`);
-                const previewBlob = new Blob([previewHtml], { type: 'text/html' });
-                const previewUrl = URL.createObjectURL(previewBlob);
-                window.open(previewUrl, '_blank');
-            }
-        }
-        
-        // Function to download a specific file
-        function downloadFile(filename) {
-            const file = window.uploadedFiles.find(f => f.name === filename);
-            if (file) {
-                const blob = new Blob([file.content], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }
-        }
-        
-        // Function to handle file acceptance
-        function acceptFiles() {
-            const files = window.uploadedFiles;
-            if (!files || files.length === 0) {
-                alert('No files to accept!');
-                return;
-            }
-            
-            // Create a list of accepted files
-            const fileList = document.createElement('div');
-            fileList.className = 'files-grid';
-            
-            files.forEach(file => {
-                const fileCard = document.createElement('div');
-                fileCard.className = 'file-card';
                 
-                const icon = getFileIcon(file.name);
-                fileCard.innerHTML = `
-                    <div class="file-icon"><i class="${icon}"></i></div>
-                    <div class="file-name">${file.name}</div>
-                    <div class="file-info">Accepted File</div>
-                    <div class="file-actions">
-                        <button class="action-btn view-btn" onclick="previewFile('${file.name}')">
-                            <i class="fas fa-eye"></i> View
-                        </button>
-                        <button class="action-btn download-btn" onclick="downloadFile('${file.name}')">
-                            <i class="fas fa-download"></i> Download
-                        </button>
-                        <button class="action-btn copy-btn" onclick="copyLink('${file.name}')">
-                            <i class="fas fa-link"></i> Copy Link
-                        </button>
-                    </div>
-                `;
+                try {
+                    const processedFiles = [];
+                    let gameFile = null;
+                    
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        const reader = new FileReader();
+                        
+                        await new Promise((resolve, reject) => {
+                            reader.onload = async (e) => {
+                                try {
+                                    // Update progress
+                                    const progress = ((i + 1) / files.length) * 100;
+                                    progressFill.style.width = `${progress}%`;
+                                    
+                                    if (file.name.toLowerCase().endsWith('.zip')) {
+                                        // Handle ZIP file
+                                        const zipFiles = await handleZipFile(file);
+                                        processedFiles.push(...zipFiles);
+                                        
+                                        // Look for game file in ZIP
+                                        const gameFiles = zipFiles.filter(f => 
+                                            f.name.toLowerCase().endsWith('.html') || 
+                                            f.name.toLowerCase().endsWith('.htm')
+                                        );
+                                        if (gameFiles.length > 0) {
+                                            gameFile = gameFiles[0];
+                                        }
+                                    } else {
+                                        // Handle regular file
+                                        processedFiles.push({
+                                            name: file.name,
+                                            content: e.target.result
+                                        });
+                                        
+                                        // Check if this is a game file
+                                        if (file.name.toLowerCase().endsWith('.html') || 
+                                            file.name.toLowerCase().endsWith('.htm')) {
+                                            gameFile = {
+                                                name: file.name,
+                                                content: e.target.result
+                                            };
+                                        }
+                                    }
+                                    
+                                    resolve();
+                                } catch (error) {
+                                    reject(error);
+                                }
+                            };
+                            reader.onerror = reject;
+                            
+                            if (file.name.toLowerCase().endsWith('.zip')) {
+                                reader.readAsArrayBuffer(file);
+                            } else {
+                                reader.readAsText(file);
+                            }
+                        });
+                    }
+                    
+                    // Store files for later use
+                    window.uploadedFiles = processedFiles;
+                    window.gameFile = gameFile;
+                    
+                    // Show upload result
+                    progressBar.style.display = 'none';
+                    uploadResult.style.display = 'block';
+                    
+                    // Enable accept button
+                    if (acceptBtn) {
+                        acceptBtn.disabled = false;
+                    }
+                    
+                    updateSteps(2);
+                    
+                } catch (error) {
+                    console.error('Error processing files:', error);
+                    alert('Error processing files. Please try again.');
+                    progressBar.style.display = 'none';
+                    if (acceptBtn) {
+                        acceptBtn.disabled = true;
+                    }
+                }
+            }
+            
+            // Function to handle file acceptance
+            function acceptFiles() {
+                const files = window.uploadedFiles;
+                const gameFile = window.gameFile;
                 
-                fileList.appendChild(fileCard);
-            });
-            
-            // Add the file list to the page
-            const container = document.querySelector('.container');
-            const existingFileList = container.querySelector('.files-grid');
-            if (existingFileList) {
-                container.replaceChild(fileList, existingFileList);
-            } else {
-                container.appendChild(fileList);
+                if (!files || files.length === 0) {
+                    alert('No files to accept!');
+                    return;
+                }
+                
+                updateSteps(3);
+                
+                // Create preview URL for the game
+                if (gameFile) {
+                    createGamePreview(gameFile.content);
+                }
+                
+                // Show preview container
+                const previewContainer = document.getElementById('previewContainer');
+                previewContainer.classList.add('show');
+                
+                // Create download link
+                const zip = new JSZip();
+                files.forEach(file => {
+                    zip.file(file.name, file.content);
+                });
+                
+                zip.generateAsync({ type: 'blob' }).then(content => {
+                    const downloadLink = document.querySelector('.download-link');
+                    const url = URL.createObjectURL(content);
+                    downloadLink.href = url;
+                    downloadLink.download = 'files.zip';
+                });
+                
+                // Create view link
+                if (gameFile) {
+                    const viewLink = document.querySelector('.view-link');
+                    const blob = new Blob([gameFile.content], { type: 'text/html' });
+                    const url = URL.createObjectURL(blob);
+                    viewLink.href = url;
+                }
+                
+                // Hide upload result
+                document.querySelector('.upload-result').style.display = 'none';
+                
+                // Clear file input
+                document.getElementById('fileInput').value = '';
             }
             
-            // Hide the upload result section
-            document.querySelector('.upload-result').style.display = 'none';
-            
-            // Clear the file input
-            document.getElementById('fileInput').value = '';
-            
-            // Show success message
-            alert('Files accepted successfully!');
-        }
-        
-        // File input change handler
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const files = e.target.files;
-            if (files.length > 0) {
-                handleFileUpload(files);
+            // Copy website link function
+            function copyWebsiteLink() {
+                const viewLink = document.querySelector('.view-link').href;
+                navigator.clipboard.writeText(viewLink).then(() => {
+                    alert('Link copied to clipboard!');
+                });
             }
-        });
-        
-        // Copy website link function
-        function copyWebsiteLink() {
-            const viewLink = document.querySelector('.view-link').href;
-            navigator.clipboard.writeText(viewLink).then(() => {
-                alert('Link copied to clipboard!');
+            
+            // File input change handler
+            document.getElementById('fileInput').addEventListener('change', function(e) {
+                const files = e.target.files;
+                if (files.length > 0) {
+                    handleFileUpload(files);
+                }
             });
-        }
-        
-        // Copy link function
-        function copyLink(path) {
-            const fullUrl = window.location.origin + window.location.pathname.replace('index.html', '') + path;
-            navigator.clipboard.writeText(fullUrl).then(() => {
-                const btn = event.target.closest('.copy-btn');
-                const tooltip = btn.parentElement.querySelector('.copy-tooltip');
-                tooltip.style.display = 'block';
-                setTimeout(() => {
-                    tooltip.style.display = 'none';
-                }, 2000);
-            });
-        }
-    </script>
+        </script>
+    </div>
 </body>
 </html>
