@@ -377,17 +377,18 @@
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-        
-        .accept-btn:hover {
-            background: #27ae60;
-            transform: translateY(-2px);
+            opacity: 1;
         }
         
         .accept-btn:disabled {
             background: #95a5a6;
             cursor: not-allowed;
-            transform: none;
+            opacity: 0.7;
+        }
+        
+        .accept-btn:not(:disabled):hover {
+            background: #27ae60;
+            transform: translateY(-2px);
         }
         
         .preview-container {
@@ -579,9 +580,10 @@
                                         }
                                     } else {
                                         // Handle regular file
+                                        const content = e.target.result;
                                         processedFiles.push({
                                             name: file.name,
-                                            content: e.target.result
+                                            content: content
                                         });
                                         
                                         // Check if this is a game file
@@ -589,22 +591,30 @@
                                             file.name.toLowerCase().endsWith('.htm')) {
                                             gameFile = {
                                                 name: file.name,
-                                                content: e.target.result
+                                                content: content
                                             };
                                         }
                                     }
-                                    
                                     resolve();
                                 } catch (error) {
+                                    console.error('Error processing file:', error);
                                     reject(error);
                                 }
                             };
-                            reader.onerror = reject;
+                            reader.onerror = (error) => {
+                                console.error('Reader error:', error);
+                                reject(error);
+                            };
                             
-                            if (file.name.toLowerCase().endsWith('.zip')) {
-                                reader.readAsArrayBuffer(file);
-                            } else {
-                                reader.readAsText(file);
+                            try {
+                                if (file.name.toLowerCase().endsWith('.zip')) {
+                                    reader.readAsArrayBuffer(file);
+                                } else {
+                                    reader.readAsText(file);
+                                }
+                            } catch (error) {
+                                console.error('Error reading file:', error);
+                                reject(error);
                             }
                         });
                     }
@@ -613,13 +623,16 @@
                     window.uploadedFiles = processedFiles;
                     window.gameFile = gameFile;
                     
-                    // Show upload result
+                    // Show upload result and enable accept button
                     progressBar.style.display = 'none';
                     uploadResult.style.display = 'block';
                     
-                    // Enable accept button
                     if (acceptBtn) {
+                        console.log('Enabling accept button');
                         acceptBtn.disabled = false;
+                        acceptBtn.style.opacity = '1';
+                    } else {
+                        console.error('Accept button not found');
                     }
                     
                     updateSteps(2);
@@ -630,6 +643,7 @@
                     progressBar.style.display = 'none';
                     if (acceptBtn) {
                         acceptBtn.disabled = true;
+                        acceptBtn.style.opacity = '0.7';
                     }
                 }
             }
@@ -691,11 +705,41 @@
                 });
             }
             
+            // Function to handle ZIP file
+            async function handleZipFile(file) {
+                try {
+                    const zip = await JSZip.loadAsync(file);
+                    const files = [];
+                    
+                    for (let filename in zip.files) {
+                        if (!zip.files[filename].dir) {
+                            try {
+                                const content = await zip.files[filename].async('string');
+                                files.push({
+                                    name: filename,
+                                    content: content
+                                });
+                            } catch (error) {
+                                console.error(`Error extracting file ${filename}:`, error);
+                            }
+                        }
+                    }
+                    
+                    return files;
+                } catch (error) {
+                    console.error('Error processing ZIP file:', error);
+                    throw error;
+                }
+            }
+            
             // File input change handler
             document.getElementById('fileInput').addEventListener('change', function(e) {
                 const files = e.target.files;
-                if (files.length > 0) {
-                    handleFileUpload(files);
+                if (files && files.length > 0) {
+                    console.log('Files selected:', files.length);
+                    handleFileUpload(Array.from(files));
+                } else {
+                    console.log('No files selected');
                 }
             });
         </script>
