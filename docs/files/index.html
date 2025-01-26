@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balloon Game</title>
+    <style>
+        /* General Styling */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            background-color: #87ceeb;
+        }
+
+        .game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Balloon Styles */
+        .balloon {
+            position: absolute;
+            width: 50px;
+            height: 70px;
+            background-color: red;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            cursor: pointer;
+            animation: moveBalloon var(--speed, 5s) linear infinite, changeColor 2s linear infinite;
+        }
+
+        @keyframes moveBalloon {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(-100%);
+            }
+        }
+
+        @keyframes changeColor {
+            0% { background-color: red; }
+            33% { background-color: blue; }
+            66% { background-color: green; }
+            100% { background-color: yellow; }
+        }
+
+        /* Bird Styles */
+        .bird {
+            position: absolute;
+            width: 70px;
+            height: 50px;
+            background-color: gray;
+            border-radius: 50%;
+            animation: flyAcross var(--bird-speed, 4s) linear infinite;
+        }
+
+        @keyframes flyAcross {
+            from {
+                left: -10%;
+            }
+            to {
+                left: 110%;
+            }
+        }
+
+        /* Scoreboard and Level Display */
+        .scoreboard, .level-display {
+            position: absolute;
+            top: 10px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        .scoreboard { left: 10px; }
+        .level-display { right: 10px; }
+
+        /* Popup Message */
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px 40px;
+            font-size: 24px;
+            text-align: center;
+            border-radius: 10px;
+            display: none;
+        }
+
+        /* Button Controls */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .controls button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .controls button#pause { background-color: orange; }
+        .controls button#restart { background-color: green; }
+        .controls button#end { background-color: red; }
+
+        .controls button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container" id="game-container">
+        <div class="scoreboard" id="scoreboard">Score: 0</div>
+        <div class="level-display" id="level-display">Level: 1</div>
+        <div class="popup" id="popup">Well Done!</div>
+        <div class="controls">
+            <button id="pause">Pause</button>
+            <button id="restart">Restart</button>
+            <button id="end">End</button>
+        </div>
+    </div>
+
+    <script>
+        const gameContainer = document.getElementById('game-container');
+        const scoreboard = document.getElementById('scoreboard');
+        const levelDisplay = document.getElementById('level-display');
+        const popup = document.getElementById('popup');
+        const pauseButton = document.getElementById('pause');
+        const restartButton = document.getElementById('restart');
+        const endButton = document.getElementById('end');
+
+        let score = 0;
+        let level = 1;
+        let maxLevel = 1; // Track the highest level achieved
+        let gamePaused = false;
+        let gameEnded = false;
+        let balloonSpeed = 5;
+        let birdFrequency = 2000; // Initial bird frequency (ms)
+        let birdSpeed = 4; // Speed in seconds
+        let balloonInterval;
+        let birdInterval;
+
+        function createBalloon() {
+            if (gameEnded) return;
+            const balloon = document.createElement('div');
+            balloon.classList.add('balloon');
+            balloon.style.left = `${Math.random() * 90}vw`;
+            balloon.style.setProperty('--speed', `${balloonSpeed}s`);
+            balloon.addEventListener('click', () => {
+                score++;
+                scoreboard.textContent = `Score: ${score}`;
+                balloon.remove();
+
+                if (score % 100 === 0) {
+                    level++;
+                    maxLevel = Math.max(maxLevel, level);
+                    balloonSpeed -= 0.5;
+                    birdFrequency -= 200; // Increase bird spawn rate
+                    birdSpeed -= 0.2; // Make birds faster
+                    levelDisplay.textContent = `Level: ${level}`;
+                    showPopup(`Well Done! Level ${level}`);
+                }
+            });
+            gameContainer.appendChild(balloon);
+
+            setTimeout(() => {
+                if (balloon.parentNode) balloon.remove();
+            }, balloonSpeed * 1000);
+        }
+
+        function createBird() {
+            if (gameEnded || level < 2) return;
+            const bird = document.createElement('div');
+            bird.classList.add('bird');
+            bird.style.top = `${Math.random() * 70 + 10}vh`;
+            bird.style.setProperty('--bird-speed', `${birdSpeed}s`);
+            gameContainer.appendChild(bird);
+
+            setTimeout(() => {
+                if (bird.parentNode) bird.remove();
+            }, birdSpeed * 1000);
+
+            bird.addEventListener('animationend', () => {
+                if (bird.parentNode) bird.remove();
+            });
+        }
+
+        function startGame() {
+            balloonInterval = setInterval(() => {
+                if (!gamePaused && !gameEnded) createBalloon();
+            }, 1000);
+
+            birdInterval = setInterval(() => {
+                if (!gamePaused && !gameEnded) createBird();
+            }, birdFrequency);
+        }
+
+        function pauseGame() {
+            gamePaused = !gamePaused;
+            pauseButton.textContent = gamePaused ? 'Resume' : 'Pause';
+        }
+
+        function restartGame() {
+            gameEnded = false;
+            score = 0;
+            level = 1;
+            balloonSpeed = 5;
+            birdFrequency = 2000;
+            birdSpeed = 4;
+            scoreboard.textContent = 'Score: 0';
+            levelDisplay.textContent = `Level: ${level}`;
+            pauseButton.textContent = 'Pause';
+            gamePaused = false;
+            document.querySelectorAll('.balloon, .bird').forEach(element => element.remove());
+            clearInterval(balloonInterval);
+            clearInterval(birdInterval);
+            startGame();
+        }
+
+        function endGame() {
+            gameEnded = true;
+            clearInterval(balloonInterval);
+            clearInterval(birdInterval);
+            alert(`Game Over! Max Level Achieved: ${maxLevel}`);
+        }
+
+        function showPopup(message) {
+            popup.textContent = message;
+            popup.style.display = 'block';
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 2000);
+        }
+
+        pauseButton.addEventListener('click', pauseGame);
+        restartButton.addEventListener('click', restartGame);
+        endButton.addEventListener('click', endGame);
+
+        startGame();
+    </script>
+</body>
+</html>
