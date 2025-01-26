@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balloon Prick Game</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f0f2f5;
+            font-family: Arial, sans-serif;
+        }
+        .game-container {
+            text-align: center;
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 2rem;
+        }
+        .balloon {
+            font-size: 5rem;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.2s;
+        }
+        .balloon:hover {
+            transform: scale(1.1);
+        }
+        .score {
+            font-size: 1.5rem;
+            margin-top: 1rem;
+            color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Balloon Prick Game</h1>
+        <div class="balloon" onclick="popBalloon()">🎈</div>
+        <div class="score">Score: <span id="score">0</span></div>
+    </div>
+
+    <script>
+        let score = 0;
+        const scoreElement = document.getElementById('score');
+        const balloon = document.querySelector('.balloon');
+
+        function popBalloon() {
+            score++;
+            scoreElement.textContent = score;
+            balloon.textContent = '💥';
+            setTimeout(() => {
+                balloon.textContent = '🎈';
+            }, 300);
+        }
+    </script>
+</body>
+</html>
