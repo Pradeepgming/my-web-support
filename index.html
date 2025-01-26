@@ -3,270 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Support Pro</title>
+    <title>My Web Support</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
             background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
         }
         .card {
+            border: none;
             border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
             margin-bottom: 20px;
+            background: white;
         }
         .card:hover {
             transform: translateY(-5px);
         }
-        .card-title {
-            color: #0d6efd;
-            margin-bottom: 1.5rem;
-        }
-        .card-title i {
-            margin-right: 10px;
-        }
-        .form-control {
+        .btn-custom {
+            background: #007bff;
+            color: white;
+            padding: 12px 25px;
             border-radius: 8px;
+            border: none;
+            width: 100%;
+            font-size: 16px;
+            margin-top: 10px;
         }
-        .btn-primary {
+        .btn-custom:hover {
+            background: #0056b3;
+            color: white;
+        }
+        .header {
+            background: #007bff;
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+        .tool-icon {
+            font-size: 2.5rem;
+            color: #007bff;
+            margin-bottom: 1rem;
+        }
+        .result-box {
+            background: #f8f9fa;
+            padding: 15px;
             border-radius: 8px;
-            padding: 8px 20px;
-        }
-        #loading {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: none;
-        }
-        .spinner-border {
-            width: 3rem;
-            height: 3rem;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="header">
         <div class="container">
-            <a class="navbar-brand" href="#">Web Support Pro</a>
+            <h1>My Web Support</h1>
+            <p class="lead">Your All-in-One Web Tools Solution</p>
         </div>
-    </nav>
+    </div>
 
-    <div class="container mt-5">
+    <div class="container">
         <div class="row">
-            <!-- Web to APK Converter -->
+            <!-- URL Shortener -->
             <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-mobile-alt"></i> Web to APK/AAB Converter</h5>
-                        <form id="apkForm" class="needs-validation" novalidate>
-                            <div class="mb-3">
-                                <label for="webUrl" class="form-label">Website URL</label>
-                                <input type="url" class="form-control" id="webUrl" required placeholder="https://example.com">
-                                <div class="invalid-feedback">Please enter a valid URL</div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="appName" class="form-label">App Name</label>
-                                <input type="text" class="form-control" id="appName" required placeholder="My App">
-                                <div class="invalid-feedback">Please enter an app name</div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Output Format</label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="format" value="apk" checked>
-                                    <label class="form-check-label">APK</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="format" value="aab">
-                                    <label class="form-check-label">AAB (Android App Bundle)</label>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">Convert</button>
-                        </form>
+                <div class="card p-4">
+                    <div class="text-center">
+                        <i class="fas fa-link tool-icon"></i>
+                        <h3>URL Shortener</h3>
+                    </div>
+                    <div class="mt-3">
+                        <input type="url" class="form-control mb-3" placeholder="Enter your long URL" id="longUrl">
+                        <button class="btn btn-custom" onclick="shortenUrl()">
+                            <i class="fas fa-compress-alt me-2"></i>Shorten URL
+                        </button>
+                        <div id="shortUrlResult" class="result-box" style="display: none;"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Link Customizer -->
+            <!-- Website Viewer -->
             <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-link"></i> Link Customizer</h5>
-                        <form id="linkForm" class="needs-validation" novalidate>
-                            <div class="mb-3">
-                                <label for="originalUrl" class="form-label">Original URL</label>
-                                <input type="url" class="form-control" id="originalUrl" required placeholder="https://example.com">
-                                <div class="invalid-feedback">Please enter a valid URL</div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="customPath" class="form-label">Custom Path</label>
-                                <input type="text" class="form-control" id="customPath" required placeholder="my-custom-link">
-                                <div class="invalid-feedback">Please enter a custom path</div>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">Generate Custom Link</button>
-                        </form>
-                        <div id="customLinkResult" class="mt-3"></div>
+                <div class="card p-4">
+                    <div class="text-center">
+                        <i class="fas fa-globe tool-icon"></i>
+                        <h3>Website Viewer</h3>
                     </div>
-                </div>
-            </div>
-
-            <!-- QR Code Generator -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-qrcode"></i> QR Code Generator</h5>
-                        <form id="qrForm" class="needs-validation" novalidate>
-                            <div class="mb-3">
-                                <label for="qrContent" class="form-label">Content</label>
-                                <input type="text" class="form-control" id="qrContent" required placeholder="Enter text or URL">
-                                <div class="invalid-feedback">Please enter content for the QR code</div>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">Generate QR Code</button>
-                        </form>
-                        <div id="qrResult" class="mt-3 text-center"></div>
+                    <div class="mt-3">
+                        <input type="url" class="form-control mb-3" placeholder="Enter website URL" id="viewUrl">
+                        <button class="btn btn-custom" onclick="viewWebsite()">
+                            <i class="fas fa-eye me-2"></i>View Website
+                        </button>
                     </div>
                 </div>
             </div>
 
             <!-- File Downloader -->
             <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-download"></i> File Downloader</h5>
-                        <form id="downloadForm" class="needs-validation" novalidate>
-                            <div class="mb-3">
-                                <label for="fileUrl" class="form-label">File URL</label>
-                                <input type="url" class="form-control" id="fileUrl" required placeholder="https://example.com/file.pdf">
-                                <div class="invalid-feedback">Please enter a valid file URL</div>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">Download File</button>
-                        </form>
+                <div class="card p-4">
+                    <div class="text-center">
+                        <i class="fas fa-download tool-icon"></i>
+                        <h3>File Downloader</h3>
+                    </div>
+                    <div class="mt-3">
+                        <input type="url" class="form-control mb-3" placeholder="Enter file URL" id="fileUrl">
+                        <button class="btn btn-custom" onclick="downloadFile()">
+                            <i class="fas fa-cloud-download-alt me-2"></i>Download File
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QR Code Generator -->
+            <div class="col-md-6">
+                <div class="card p-4">
+                    <div class="text-center">
+                        <i class="fas fa-qrcode tool-icon"></i>
+                        <h3>QR Code Generator</h3>
+                    </div>
+                    <div class="mt-3">
+                        <input type="text" class="form-control mb-3" placeholder="Enter text or URL" id="qrText">
+                        <button class="btn btn-custom" onclick="generateQR()">
+                            <i class="fas fa-barcode me-2"></i>Generate QR Code
+                        </button>
+                        <div id="qrResult" class="text-center mt-3"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="loading">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    </div>
-
-    <footer class="bg-light py-3 mt-5">
-        <div class="container text-center">
-            <p>&copy; 2025 Web Support Pro. All rights reserved.</p>
-        </div>
+    <footer class="text-center py-4 mt-5">
+        <p> 2025 My Web Support. All rights reserved.</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Form validation
-            const forms = document.querySelectorAll('.needs-validation');
-            forms.forEach(form => {
-                form.addEventListener('submit', event => {
-                    if (!form.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                });
-            });
-
-            // Web to APK/AAB Converter
-            document.getElementById('apkForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                if (this.checkValidity()) {
-                    const url = document.getElementById('webUrl').value;
-                    const appName = document.getElementById('appName').value;
-                    const format = document.querySelector('input[name="format"]:checked').value;
-                    
-                    showLoading();
-                    setTimeout(() => {
-                        hideLoading();
-                        alert(`Converting ${url} to ${format.toUpperCase()} format with name: ${appName}\nNote: This is a demo. Actual conversion requires a backend service.`);
-                    }, 1500);
-                }
-            });
-
-            // Link Customizer
-            document.getElementById('linkForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                if (this.checkValidity()) {
-                    const originalUrl = document.getElementById('originalUrl').value;
-                    const customPath = document.getElementById('customPath').value;
-                    const result = document.getElementById('customLinkResult');
-                    
-                    showLoading();
-                    setTimeout(() => {
-                        hideLoading();
-                        result.innerHTML = `
-                            <div class="alert alert-success">
-                                <strong>Custom Link:</strong> <br>
-                                <a href="${originalUrl}" target="_blank">yourshortener.com/${customPath}</a>
-                            </div>
-                        `;
-                    }, 1000);
-                }
-            });
-
-            // File Downloader
-            document.getElementById('downloadForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                if (this.checkValidity()) {
-                    const fileUrl = document.getElementById('fileUrl').value;
-                    window.open(fileUrl, '_blank');
-                }
-            });
-
-            // QR Code Generator
-            document.getElementById('qrForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                if (this.checkValidity()) {
-                    const content = document.getElementById('qrContent').value;
-                    const qrResult = document.getElementById('qrResult');
-                    
-                    showLoading();
-                    qrResult.innerHTML = '';
-                    
-                    setTimeout(() => {
-                        QRCode.toCanvas(content, function(error, canvas) {
-                            hideLoading();
-                            if (error) {
-                                qrResult.innerHTML = '<div class="alert alert-danger">Error generating QR code</div>';
-                                console.error(error);
-                                return;
-                            }
-                            canvas.style.maxWidth = '100%';
-                            qrResult.appendChild(canvas);
-                            
-                            // Add download button
-                            const downloadBtn = document.createElement('button');
-                            downloadBtn.className = 'btn btn-secondary mt-3';
-                            downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download QR Code';
-                            downloadBtn.onclick = function() {
-                                const link = document.createElement('a');
-                                link.download = 'qrcode.png';
-                                link.href = canvas.toDataURL();
-                                link.click();
-                            };
-                            qrResult.appendChild(downloadBtn);
-                        });
-                    }, 1000);
-                }
-            });
-
-            function showLoading() {
-                document.getElementById('loading').style.display = 'block';
+        function shortenUrl() {
+            const longUrl = document.getElementById('longUrl').value;
+            if (!longUrl) {
+                alert('Please enter a URL');
+                return;
             }
+            const result = document.getElementById('shortUrlResult');
+            result.style.display = 'block';
+            result.innerHTML = `
+                <div class="alert alert-success">
+                    <strong>Shortened URL:</strong><br>
+                    <a href="${longUrl}" target="_blank">https://short.url/${Math.random().toString(36).substr(2, 6)}</a>
+                </div>
+            `;
+        }
 
-            function hideLoading() {
-                document.getElementById('loading').style.display = 'none';
+        function viewWebsite() {
+            const url = document.getElementById('viewUrl').value;
+            if (!url) {
+                alert('Please enter a URL');
+                return;
             }
-        });
+            window.open(url, '_blank');
+        }
+
+        function downloadFile() {
+            const url = document.getElementById('fileUrl').value;
+            if (!url) {
+                alert('Please enter a file URL');
+                return;
+            }
+            window.open(url, '_blank');
+        }
+
+        function generateQR() {
+            const text = document.getElementById('qrText').value;
+            if (!text) {
+                alert('Please enter text or URL');
+                return;
+            }
+            const qrResult = document.getElementById('qrResult');
+            qrResult.innerHTML = '';
+            
+            QRCode.toCanvas(text, { width: 200 }, function(error, canvas) {
+                if (error) {
+                    alert('Error generating QR code');
+                    return;
+                }
+                qrResult.appendChild(canvas);
+                
+                // Add download button
+                const downloadBtn = document.createElement('button');
+                downloadBtn.className = 'btn btn-custom mt-3';
+                downloadBtn.style.maxWidth = '200px';
+                downloadBtn.innerHTML = '<i class="fas fa-download me-2"></i>Download QR';
+                downloadBtn.onclick = function() {
+                    const link = document.createElement('a');
+                    link.download = 'qrcode.png';
+                    link.href = canvas.toDataURL();
+                    link.click();
+                };
+                qrResult.appendChild(downloadBtn);
+            });
+        }
     </script>
 </body>
 </html>
