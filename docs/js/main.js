@@ -317,6 +317,75 @@ function copyShortUrl() {
     });
 }
 
+// URL Shortener
+function shortenUrl() {
+    const longUrl = document.getElementById('longUrl').value;
+    if (!longUrl) {
+        alert('Please enter a URL');
+        return;
+    }
+    const result = document.getElementById('shortUrlResult');
+    result.style.display = 'block';
+    result.innerHTML = `
+        <div class="alert alert-success">
+            <strong>Shortened URL:</strong><br>
+            <a href="${longUrl}" target="_blank">https://short.url/${Math.random().toString(36).substr(2, 6)}</a>
+        </div>
+    `;
+}
+
+// Website Viewer
+function viewWebsite() {
+    const url = document.getElementById('viewUrl').value;
+    if (!url) {
+        alert('Please enter a URL');
+        return;
+    }
+    window.open(url, '_blank');
+}
+
+// File Downloader
+function downloadFile() {
+    const url = document.getElementById('fileUrl').value;
+    if (!url) {
+        alert('Please enter a file URL');
+        return;
+    }
+    window.open(url, '_blank');
+}
+
+// QR Code Generator
+function generateQR() {
+    const text = document.getElementById('qrText').value;
+    if (!text) {
+        alert('Please enter text or URL');
+        return;
+    }
+    const qrResult = document.getElementById('qrResult');
+    qrResult.innerHTML = '';
+    
+    QRCode.toCanvas(text, { width: 200 }, function(error, canvas) {
+        if (error) {
+            alert('Error generating QR code');
+            return;
+        }
+        qrResult.appendChild(canvas);
+        
+        // Add download button
+        const downloadBtn = document.createElement('button');
+        downloadBtn.className = 'btn btn-custom mt-3';
+        downloadBtn.style.maxWidth = '200px';
+        downloadBtn.innerHTML = '<i class="fas fa-download me-2"></i>Download QR';
+        downloadBtn.onclick = function() {
+            const link = document.createElement('a');
+            link.download = 'qrcode.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        };
+        qrResult.appendChild(downloadBtn);
+    });
+}
+
 // Initialize event listeners
 document.addEventListener('DOMContentLoaded', function() {
     // Handle password protection toggle

@@ -1,9 +1,9 @@
 :root {
-    --primary-color: #3498db;
+    --primary-color: #007bff;
     --secondary-color: #2ecc71;
-    --background-color: #f5f6fa;
+    --background-color: #f8f9fa;
     --text-color: #2c3e50;
-    --border-color: #dcdde1;
+    --border-color: #dee2e6;
 }
 
 * {
@@ -13,7 +13,7 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: Arial, sans-serif;
     background-color: var(--background-color);
     color: var(--text-color);
     line-height: 1.6;
@@ -25,11 +25,31 @@ body {
     padding: 2rem;
 }
 
-h1 {
+.header {
+    background: var(--primary-color);
+    color: white;
+    padding: 2rem 0;
+    margin-bottom: 3rem;
     text-align: center;
-    color: var(--primary-color);
-    margin-bottom: 2rem;
+}
+
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+    margin-bottom: 20px;
+    background: white;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.tool-icon {
     font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
 }
 
 .step-indicator {
@@ -296,6 +316,41 @@ h1 {
 
 .copy-link:hover {
     transform: scale(1.1);
+}
+
+.form-control {
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    padding: 12px;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    border-color: #80bdff;
+}
+
+.btn-custom {
+    background: var(--primary-color);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    border: none;
+    width: 100%;
+    font-size: 16px;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.btn-custom:hover {
+    background: #0056b3;
+    color: white;
+}
+
+.result-box {
+    background: var(--background-color);
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
 }
 
 @media (max-width: 768px) {
