@@ -435,6 +435,85 @@
             color: white;
         }
         
+        .url-customization {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .url-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .url-input input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .url-input input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        .password-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .password-toggle input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .password-input {
+            display: none;
+            margin-top: 10px;
+        }
+        
+        .password-input.show {
+            display: block;
+        }
+        
+        .generate-link-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .generate-link-btn:hover {
+            background: #2980b9;
+        }
+        
+        .short-url {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .short-url span {
+            flex: 1;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -485,6 +564,28 @@
         <div id="previewContainer" class="preview-container">
             <div class="result-card">
                 <div class="result-title">Your files are ready!</div>
+                <div class="url-customization">
+                    <h3>Customize Your Link</h3>
+                    <div class="url-input">
+                        <input type="text" id="customUrl" placeholder="Enter custom URL name (optional)" />
+                    </div>
+                    <div class="password-toggle">
+                        <input type="checkbox" id="passwordProtection" />
+                        <label for="passwordProtection">Add Password Protection</label>
+                    </div>
+                    <div id="passwordInput" class="password-input">
+                        <input type="password" id="filePassword" placeholder="Enter password" />
+                    </div>
+                    <button class="generate-link-btn" onclick="generateCustomLink()">
+                        Generate Link
+                    </button>
+                    <div id="shortUrl" class="short-url" style="display: none">
+                        <span id="shortUrlText"></span>
+                        <button class="copy-link" onclick="copyShortUrl()">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
                 <div class="result-links">
                     <a href="#" class="result-link view-link" target="_blank">
                         <i class="fas fa-eye"></i> View Website
@@ -492,12 +593,8 @@
                     <a href="#" class="result-link download-link" download>
                         <i class="fas fa-download"></i> Download Files
                     </a>
-                    <button class="result-link copy-link" onclick="copyWebsiteLink()">
-                        <i class="fas fa-link"></i> Copy Link
-                    </button>
                 </div>
             </div>
-            
             <div id="gamePreview" class="game-container"></div>
         </div>
         
@@ -731,6 +828,167 @@
                     throw error;
                 }
             }
+            
+            // Function to generate a short hash
+            function generateShortHash(length = 6) {
+                const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let hash = '';
+                for (let i = 0; i < length; i++) {
+                    hash += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return hash;
+            }
+            
+            // Function to handle password protection toggle
+            document.getElementById('passwordProtection').addEventListener('change', function(e) {
+                const passwordInput = document.getElementById('passwordInput');
+                if (e.target.checked) {
+                    passwordInput.classList.add('show');
+                } else {
+                    passwordInput.classList.remove('show');
+                    document.getElementById('filePassword').value = '';
+                }
+            });
+            
+            // Function to generate custom link
+            function generateCustomLink() {
+                const customUrl = document.getElementById('customUrl').value;
+                const usePassword = document.getElementById('passwordProtection').checked;
+                const password = usePassword ? document.getElementById('filePassword').value : '';
+                
+                // Validate password if protection is enabled
+                if (usePassword && !password) {
+                    alert('Please enter a password');
+                    return;
+                }
+                
+                // Generate URL hash
+                const urlHash = customUrl || generateShortHash();
+                
+                // Create blob URL for the game content
+                const gameFile = window.gameFile;
+                if (gameFile) {
+                    let content = gameFile.content;
+                    
+                    // If password protection is enabled, wrap the content in a password check
+                    if (usePassword) {
+                        content = `
+                            <!DOCTYPE html>
+                            <html>
+                            <head>
+                                <title>Protected Content</title>
+                                <style>
+                                    .password-screen {
+                                        position: fixed;
+                                        top: 0;
+                                        left: 0;
+                                        width: 100%;
+                                        height: 100%;
+                                        background: white;
+                                        display: flex;
+                                        flex-direction: column;
+                                        align-items: center;
+                                        justify-content: center;
+                                        z-index: 1000;
+                                    }
+                                    .password-screen.hidden {
+                                        display: none;
+                                    }
+                                    .password-form {
+                                        text-align: center;
+                                    }
+                                    .password-input {
+                                        margin: 10px 0;
+                                        padding: 8px;
+                                    }
+                                    .submit-btn {
+                                        padding: 8px 16px;
+                                        background: #3498db;
+                                        color: white;
+                                        border: none;
+                                        border-radius: 4px;
+                                        cursor: pointer;
+                                    }
+                                </style>
+                            </head>
+                            <body>
+                                <div id="passwordScreen" class="password-screen">
+                                    <div class="password-form">
+                                        <h2>Protected Content</h2>
+                                        <input type="password" id="password" class="password-input" placeholder="Enter password">
+                                        <button onclick="checkPassword()" class="submit-btn">Submit</button>
+                                    </div>
+                                </div>
+                                <div id="content" style="display:none">
+                                    ${content}
+                                </div>
+                                <script>
+                                    function checkPassword() {
+                                        const password = document.getElementById('password').value;
+                                        if (password === '${password}') {
+                                            document.getElementById('passwordScreen').classList.add('hidden');
+                                            document.getElementById('content').style.display = 'block';
+                                        } else {
+                                            alert('Incorrect password');
+                                        }
+                                    }
+                                </script>
+                            </body>
+                            </html>
+                        `;
+                    }
+                    
+                    const blob = new Blob([content], { type: 'text/html' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    // Update view link
+                    const viewLink = document.querySelector('.view-link');
+                    viewLink.href = url;
+                    
+                    // Show short URL
+                    const shortUrlDiv = document.getElementById('shortUrl');
+                    const shortUrlText = document.getElementById('shortUrlText');
+                    const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
+                    const finalUrl = `${baseUrl}#${urlHash}${usePassword ? ':protected' : ''}`;
+                    
+                    shortUrlText.textContent = finalUrl;
+                    shortUrlDiv.style.display = 'flex';
+                    
+                    // Store URL data in localStorage
+                    const urlData = {
+                        url: url,
+                        password: usePassword ? password : null,
+                        content: content
+                    };
+                    localStorage.setItem(`url_${urlHash}`, JSON.stringify(urlData));
+                }
+            }
+            
+            // Function to copy short URL
+            function copyShortUrl() {
+                const shortUrl = document.getElementById('shortUrlText').textContent;
+                navigator.clipboard.writeText(shortUrl).then(() => {
+                    alert('URL copied to clipboard!');
+                });
+            }
+            
+            // Check for shared URL on page load
+            window.addEventListener('load', function() {
+                const hash = window.location.hash.substring(1);
+                if (hash) {
+                    const [urlHash, protection] = hash.split(':');
+                    const urlData = localStorage.getItem(`url_${urlHash}`);
+                    
+                    if (urlData) {
+                        const data = JSON.parse(urlData);
+                        if (data.content) {
+                            const blob = new Blob([data.content], { type: 'text/html' });
+                            const url = URL.createObjectURL(blob);
+                            window.location.href = url;
+                        }
+                    }
+                }
+            });
             
             // File input change handler
             document.getElementById('fileInput').addEventListener('change', function(e) {
