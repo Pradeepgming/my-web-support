@@ -381,7 +381,7 @@
                     <button class="generate-link-btn" onclick="generateCustomLink()">
                         Generate Link
                     </button>
-                    <div id="shortUrl" class="short-url" style="display: none">
+                    <div id="shortUrl" class="short-url">
                         <span id="shortUrlText"></span>
                         <button class="copy-link" onclick="copyShortUrl()">
                             <i class="fas fa-copy"></i>
@@ -406,33 +406,22 @@
         function updateSteps(currentStep) {
             const steps = document.querySelectorAll('.step');
             steps.forEach((step, index) => {
-                step.classList.remove('active', 'completed');
                 if (index + 1 < currentStep) {
                     step.classList.add('completed');
+                    step.classList.remove('active');
                 } else if (index + 1 === currentStep) {
                     step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
                 }
             });
-        }
-        
-        // Function to create HTML preview for a game file
-        function createGamePreview(content) {
-            const gameContainer = document.getElementById('gamePreview');
-            const iframe = document.createElement('iframe');
-            iframe.sandbox = 'allow-scripts allow-same-origin allow-popups allow-forms';
-            
-            // Create a blob URL for the game content
-            const blob = new Blob([content], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            iframe.src = url;
-            
-            // Clear previous content and add new iframe
-            gameContainer.innerHTML = '';
-            gameContainer.appendChild(iframe);
         }
 
         // Function to handle file upload
         async function handleFileUpload(files) {
+            if (!files || files.length === 0) return;
+            
             updateSteps(1);
             const progressBar = document.querySelector('.upload-progress');
             const progressFill = document.querySelector('.progress-fill');
@@ -463,16 +452,13 @@
                     await new Promise((resolve, reject) => {
                         reader.onload = async (e) => {
                             try {
-                                // Update progress
                                 const progress = ((i + 1) / files.length) * 100;
                                 progressFill.style.width = `${progress}%`;
                                 
                                 if (file.name.toLowerCase().endsWith('.zip')) {
-                                    // Handle ZIP file
                                     const zipFiles = await handleZipFile(file);
                                     processedFiles.push(...zipFiles);
                                     
-                                    // Look for game file in ZIP
                                     const gameFiles = zipFiles.filter(f => 
                                         f.name.toLowerCase().endsWith('.html') || 
                                         f.name.toLowerCase().endsWith('.htm')
@@ -481,13 +467,11 @@
                                         gameFile = gameFiles[0];
                                     }
                                 } else {
-                                    // Handle regular file
                                     processedFiles.push({
                                         name: file.name,
                                         content: e.target.result
                                     });
                                     
-                                    // Check if this is a game file
                                     if (file.name.toLowerCase().endsWith('.html') || 
                                         file.name.toLowerCase().endsWith('.htm')) {
                                         gameFile = {
@@ -513,15 +497,12 @@
                     });
                 }
                 
-                // Store files for later use
                 window.uploadedFiles = processedFiles;
                 window.gameFile = gameFile;
                 
-                // Show upload result
                 progressBar.style.display = 'none';
                 uploadResult.style.display = 'block';
                 
-                // Enable accept button
                 if (acceptBtn) {
                     acceptBtn.disabled = false;
                 }
@@ -538,7 +519,7 @@
                 }
             }
         }
-        
+
         // Function to handle file acceptance
         function acceptFiles() {
             const files = window.uploadedFiles;
@@ -551,16 +532,13 @@
             
             updateSteps(3);
             
-            // Create preview URL for the game
             if (gameFile) {
                 createGamePreview(gameFile.content);
             }
             
-            // Show preview container
             const previewContainer = document.getElementById('previewContainer');
             previewContainer.classList.add('show');
             
-            // Create download link
             const zip = new JSZip();
             files.forEach(file => {
                 zip.file(file.name, file.content);
@@ -573,21 +551,24 @@
                 downloadLink.download = 'files.zip';
             });
             
-            // Hide upload result
             document.querySelector('.upload-result').style.display = 'none';
-            
-            // Clear file input
             document.getElementById('fileInput').value = '';
         }
-        
-        // Copy website link function
-        function copyWebsiteLink() {
-            const viewLink = document.querySelector('.view-link').href;
-            navigator.clipboard.writeText(viewLink).then(() => {
-                alert('Link copied to clipboard!');
-            });
+
+        // Function to create game preview
+        function createGamePreview(content) {
+            const gameContainer = document.getElementById('gamePreview');
+            const iframe = document.createElement('iframe');
+            iframe.sandbox = 'allow-scripts allow-same-origin allow-popups allow-forms';
+            
+            const blob = new Blob([content], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            iframe.src = url;
+            
+            gameContainer.innerHTML = '';
+            gameContainer.appendChild(iframe);
         }
-        
+
         // Function to handle ZIP file
         async function handleZipFile(file) {
             try {
@@ -596,15 +577,11 @@
                 
                 for (let filename in zip.files) {
                     if (!zip.files[filename].dir) {
-                        try {
-                            const content = await zip.files[filename].async('string');
-                            files.push({
-                                name: filename,
-                                content: content
-                            });
-                        } catch (error) {
-                            console.error(`Error extracting file ${filename}:`, error);
-                        }
+                        const content = await zip.files[filename].async('string');
+                        files.push({
+                            name: filename,
+                            content: content
+                        });
                     }
                 }
                 
@@ -614,7 +591,118 @@
                 throw error;
             }
         }
-        
+
+        // Function to generate custom link
+        function generateCustomLink() {
+            const customUrl = document.getElementById('customUrl').value;
+            const usePassword = document.getElementById('passwordProtection').checked;
+            const password = usePassword ? document.getElementById('filePassword').value : '';
+            
+            if (usePassword && !password) {
+                alert('Please enter a password');
+                return;
+            }
+            
+            const urlHash = customUrl || generateShortHash();
+            const gameFile = window.gameFile;
+            
+            if (gameFile) {
+                let content = gameFile.content;
+                
+                if (usePassword) {
+                    content = wrapWithPasswordProtection(content, password);
+                }
+                
+                const blob = new Blob([content], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                
+                const viewLink = document.querySelector('.view-link');
+                viewLink.href = url;
+                
+                const shortUrlDiv = document.getElementById('shortUrl');
+                const shortUrlText = document.getElementById('shortUrlText');
+                const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
+                const finalUrl = `${baseUrl}#${urlHash}${usePassword ? ':protected' : ''}`;
+                
+                shortUrlText.textContent = finalUrl;
+                shortUrlDiv.style.display = 'flex';
+                
+                localStorage.setItem(`url_${urlHash}`, JSON.stringify({
+                    url: url,
+                    password: usePassword ? password : null,
+                    content: content
+                }));
+            }
+        }
+
+        // Function to wrap content with password protection
+        function wrapWithPasswordProtection(content, password) {
+            return `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Protected Content</title>
+                    <style>
+                        .password-screen {
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background: white;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            justify-content: center;
+                            z-index: 1000;
+                        }
+                        .password-screen.hidden {
+                            display: none;
+                        }
+                        .password-form {
+                            text-align: center;
+                        }
+                        .password-input {
+                            margin: 10px 0;
+                            padding: 8px;
+                        }
+                        .submit-btn {
+                            padding: 8px 16px;
+                            background: #3498db;
+                            color: white;
+                            border: none;
+                            border-radius: 4px;
+                            cursor: pointer;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div id="passwordScreen" class="password-screen">
+                        <div class="password-form">
+                            <h2>Protected Content</h2>
+                            <input type="password" id="password" class="password-input" placeholder="Enter password">
+                            <button onclick="checkPassword()" class="submit-btn">Submit</button>
+                        </div>
+                    </div>
+                    <div id="content" style="display:none">
+                        ${content}
+                    </div>
+                    <script>
+                        function checkPassword() {
+                            const password = document.getElementById('password').value;
+                            if (password === '${password}') {
+                                document.getElementById('passwordScreen').classList.add('hidden');
+                                document.getElementById('content').style.display = 'block';
+                            } else {
+                                alert('Incorrect password');
+                            }
+                        }
+                    </script>
+                </body>
+                </html>
+            `;
+        }
+
         // Function to generate a short hash
         function generateShortHash(length = 6) {
             const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -624,8 +712,16 @@
             }
             return hash;
         }
-        
-        // Function to handle password protection toggle
+
+        // Function to copy short URL
+        function copyShortUrl() {
+            const shortUrl = document.getElementById('shortUrlText').textContent;
+            navigator.clipboard.writeText(shortUrl).then(() => {
+                alert('URL copied to clipboard!');
+            });
+        }
+
+        // Handle password protection toggle
         document.getElementById('passwordProtection').addEventListener('change', function(e) {
             const passwordInput = document.getElementById('passwordInput');
             if (e.target.checked) {
@@ -635,129 +731,7 @@
                 document.getElementById('filePassword').value = '';
             }
         });
-        
-        // Function to generate custom link
-        function generateCustomLink() {
-            const customUrl = document.getElementById('customUrl').value;
-            const usePassword = document.getElementById('passwordProtection').checked;
-            const password = usePassword ? document.getElementById('filePassword').value : '';
-            
-            // Validate password if protection is enabled
-            if (usePassword && !password) {
-                alert('Please enter a password');
-                return;
-            }
-            
-            // Generate URL hash
-            const urlHash = customUrl || generateShortHash();
-            
-            // Create blob URL for the game content
-            const gameFile = window.gameFile;
-            if (gameFile) {
-                let content = gameFile.content;
-                
-                // If password protection is enabled, wrap the content in a password check
-                if (usePassword) {
-                    content = `
-                        <!DOCTYPE html>
-                        <html>
-                        <head>
-                            <title>Protected Content</title>
-                            <style>
-                                .password-screen {
-                                    position: fixed;
-                                    top: 0;
-                                    left: 0;
-                                    width: 100%;
-                                    height: 100%;
-                                    background: white;
-                                    display: flex;
-                                    flex-direction: column;
-                                    align-items: center;
-                                    justify-content: center;
-                                    z-index: 1000;
-                                }
-                                .password-screen.hidden {
-                                    display: none;
-                                }
-                                .password-form {
-                                    text-align: center;
-                                }
-                                .password-input {
-                                    margin: 10px 0;
-                                    padding: 8px;
-                                }
-                                .submit-btn {
-                                    padding: 8px 16px;
-                                    background: #3498db;
-                                    color: white;
-                                    border: none;
-                                    border-radius: 4px;
-                                    cursor: pointer;
-                                }
-                            </style>
-                        </head>
-                        <body>
-                            <div id="passwordScreen" class="password-screen">
-                                <div class="password-form">
-                                    <h2>Protected Content</h2>
-                                    <input type="password" id="password" class="password-input" placeholder="Enter password">
-                                    <button onclick="checkPassword()" class="submit-btn">Submit</button>
-                                </div>
-                            </div>
-                            <div id="content" style="display:none">
-                                ${content}
-                            </div>
-                            <script>
-                                function checkPassword() {
-                                    const password = document.getElementById('password').value;
-                                    if (password === '${password}') {
-                                        document.getElementById('passwordScreen').classList.add('hidden');
-                                        document.getElementById('content').style.display = 'block';
-                                    } else {
-                                        alert('Incorrect password');
-                                    }
-                                }
-                            </script>
-                        </body>
-                        </html>
-                    `;
-                }
-                
-                const blob = new Blob([content], { type: 'text/html' });
-                const url = URL.createObjectURL(blob);
-                
-                // Update view link
-                const viewLink = document.querySelector('.view-link');
-                viewLink.href = url;
-                
-                // Show short URL
-                const shortUrlDiv = document.getElementById('shortUrl');
-                const shortUrlText = document.getElementById('shortUrlText');
-                const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
-                const finalUrl = `${baseUrl}#${urlHash}${usePassword ? ':protected' : ''}`;
-                
-                shortUrlText.textContent = finalUrl;
-                shortUrlDiv.style.display = 'flex';
-                
-                // Store URL data in localStorage
-                const urlData = {
-                    url: url,
-                    password: usePassword ? password : null,
-                    content: content
-                };
-                localStorage.setItem(`url_${urlHash}`, JSON.stringify(urlData));
-            }
-        }
-        
-        // Function to copy short URL
-        function copyShortUrl() {
-            const shortUrl = document.getElementById('shortUrlText').textContent;
-            navigator.clipboard.writeText(shortUrl).then(() => {
-                alert('URL copied to clipboard!');
-            });
-        }
-        
+
         // Check for shared URL on page load
         window.addEventListener('load', function() {
             const hash = window.location.hash.substring(1);
@@ -775,15 +749,12 @@
                 }
             }
         });
-        
+
         // File input change handler
         document.getElementById('fileInput').addEventListener('change', function(e) {
             const files = e.target.files;
             if (files && files.length > 0) {
-                console.log('Files selected:', files.length);
                 handleFileUpload(Array.from(files));
-            } else {
-                console.log('No files selected');
             }
         });
     </script>
