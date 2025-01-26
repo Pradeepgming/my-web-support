@@ -364,6 +364,32 @@
             white-space: pre-wrap;
         }
         
+        .accept-btn {
+            background: var(--secondary-color);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .accept-btn:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+        
+        .accept-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -387,7 +413,7 @@
             <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
                 <i class="fas fa-cloud-upload-alt"></i> Upload Files
             </button>
-            <input type="file" id="fileInput" style="display: none" multiple>
+            <input type="file" id="fileInput" style="display: none" multiple accept=".zip,.html,.txt,.js,.css,.xml,.json">
             
             <div class="upload-progress">
                 <div class="progress-bar">
@@ -409,6 +435,9 @@
                             <i class="fas fa-link"></i> Copy Link
                         </button>
                     </div>
+                    <button class="accept-btn" onclick="acceptFiles()">
+                        <i class="fas fa-check"></i> Accept Files
+                    </button>
                 </div>
             </div>
         </div>
@@ -637,9 +666,14 @@
             const progressBar = document.querySelector('.upload-progress');
             const progressFill = document.querySelector('.progress-fill');
             const uploadResult = document.querySelector('.upload-result');
+            const acceptBtn = document.querySelector('.accept-btn');
             
             progressBar.style.display = 'block';
             uploadResult.style.display = 'none';
+            
+            if (acceptBtn) {
+                acceptBtn.disabled = true;
+            }
             
             try {
                 const processedFiles = [];
@@ -715,10 +749,18 @@
                 // Store files in window for preview/download
                 window.uploadedFiles = processedFiles;
                 
+                // Enable accept button
+                if (acceptBtn) {
+                    acceptBtn.disabled = false;
+                }
+                
             } catch (error) {
                 console.error('Error processing files:', error);
                 alert('Error processing files. Please try again.');
                 progressBar.style.display = 'none';
+                if (acceptBtn) {
+                    acceptBtn.disabled = true;
+                }
             }
         }
         
@@ -747,6 +789,62 @@
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
             }
+        }
+        
+        // Function to handle file acceptance
+        function acceptFiles() {
+            const files = window.uploadedFiles;
+            if (!files || files.length === 0) {
+                alert('No files to accept!');
+                return;
+            }
+            
+            // Create a list of accepted files
+            const fileList = document.createElement('div');
+            fileList.className = 'files-grid';
+            
+            files.forEach(file => {
+                const fileCard = document.createElement('div');
+                fileCard.className = 'file-card';
+                
+                const icon = getFileIcon(file.name);
+                fileCard.innerHTML = `
+                    <div class="file-icon"><i class="${icon}"></i></div>
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-info">Accepted File</div>
+                    <div class="file-actions">
+                        <button class="action-btn view-btn" onclick="previewFile('${file.name}')">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button class="action-btn download-btn" onclick="downloadFile('${file.name}')">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                        <button class="action-btn copy-btn" onclick="copyLink('${file.name}')">
+                            <i class="fas fa-link"></i> Copy Link
+                        </button>
+                    </div>
+                `;
+                
+                fileList.appendChild(fileCard);
+            });
+            
+            // Add the file list to the page
+            const container = document.querySelector('.container');
+            const existingFileList = container.querySelector('.files-grid');
+            if (existingFileList) {
+                container.replaceChild(fileList, existingFileList);
+            } else {
+                container.appendChild(fileList);
+            }
+            
+            // Hide the upload result section
+            document.querySelector('.upload-result').style.display = 'none';
+            
+            // Clear the file input
+            document.getElementById('fileInput').value = '';
+            
+            // Show success message
+            alert('Files accepted successfully!');
         }
         
         // File input change handler
