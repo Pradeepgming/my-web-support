@@ -272,6 +272,98 @@
             opacity: 0.9;
         }
         
+        .file-list {
+            margin-top: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .file-list-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+        }
+        
+        .file-list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .file-list-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .file-list-icon {
+            color: var(--primary-color);
+            width: 24px;
+            text-align: center;
+        }
+        
+        .file-list-name {
+            flex: 1;
+            font-size: 0.9em;
+        }
+        
+        .file-list-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .file-list-btn {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.8em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: white;
+        }
+        
+        .file-list-btn.view {
+            background: var(--primary-color);
+        }
+        
+        .file-list-btn.download {
+            background: var(--secondary-color);
+        }
+        
+        .file-preview {
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .file-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .file-preview-title {
+            font-weight: bold;
+            color: var(--text-color);
+        }
+        
+        .file-preview-content {
+            max-height: 500px;
+            overflow: auto;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -425,13 +517,38 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         h1 { color: #2c3e50; }
+        .file-list {
+            margin-top: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+        .file-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .file-item:last-child {
+            border-bottom: none;
+        }
+        .file-icon {
+            color: #3498db;
+            width: 24px;
+            text-align: center;
+        }
+        .file-name {
+            flex: 1;
+        }
         pre {
             background: #f8f9fa;
             padding: 15px;
             border-radius: 4px;
             overflow-x: auto;
+            margin: 0;
         }
     </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
@@ -441,6 +558,78 @@
 </body>
 </html>`;
             return template;
+        }
+
+        // Function to get file icon based on extension
+        function getFileIcon(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            const icons = {
+                'html': 'fab fa-html5',
+                'css': 'fab fa-css3-alt',
+                'js': 'fab fa-js',
+                'json': 'fas fa-code',
+                'xml': 'fas fa-code',
+                'txt': 'fas fa-file-alt',
+                'md': 'fas fa-file-alt',
+                'jpg': 'fas fa-image',
+                'jpeg': 'fas fa-image',
+                'png': 'fas fa-image',
+                'gif': 'fas fa-image',
+                'pdf': 'fas fa-file-pdf',
+                'zip': 'fas fa-file-archive',
+                'rar': 'fas fa-file-archive',
+                '7z': 'fas fa-file-archive',
+                'doc': 'fas fa-file-word',
+                'docx': 'fas fa-file-word',
+                'xls': 'fas fa-file-excel',
+                'xlsx': 'fas fa-file-excel',
+                'ppt': 'fas fa-file-powerpoint',
+                'pptx': 'fas fa-file-powerpoint'
+            };
+            return icons[ext] || 'fas fa-file';
+        }
+
+        // Function to handle ZIP file
+        async function handleZipFile(file) {
+            const zip = await JSZip.loadAsync(file);
+            const files = [];
+            
+            for (let filename in zip.files) {
+                if (!zip.files[filename].dir) {
+                    const content = await zip.files[filename].async('string');
+                    files.push({
+                        name: filename,
+                        content: content
+                    });
+                }
+            }
+            
+            return files;
+        }
+
+        // Function to create file list HTML
+        function createFileListHtml(files) {
+            let html = '<div class="file-list">';
+            files.forEach(file => {
+                const icon = getFileIcon(file.name);
+                html += `
+                    <div class="file-list-item">
+                        <div class="file-list-icon">
+                            <i class="${icon}"></i>
+                        </div>
+                        <div class="file-list-name">${file.name}</div>
+                        <div class="file-list-actions">
+                            <button class="file-list-btn view" onclick="previewFile('${file.name}')">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="file-list-btn download" onclick="downloadFile('${file.name}')">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                        </div>
+                    </div>`;
+            });
+            html += '</div>';
+            return html;
         }
 
         // Function to handle file upload
@@ -453,11 +642,8 @@
             uploadResult.style.display = 'none';
             
             try {
-                // Create a new ZIP file
-                const zip = new JSZip();
-                const htmlFiles = [];
+                const processedFiles = [];
                 
-                // Process each file
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
                     const reader = new FileReader();
@@ -469,17 +655,15 @@
                                 const progress = ((i + 1) / files.length) * 100;
                                 progressFill.style.width = `${progress}%`;
                                 
-                                // Add original file to ZIP
-                                zip.file(file.name, e.target.result);
-                                
-                                // Create HTML preview for text files
-                                if (file.type.startsWith('text/') || file.name.match(/\.(txt|html|css|js|json|xml|md|py|java|cpp|c|h|cs|php)$/i)) {
-                                    const content = e.target.result;
-                                    const htmlContent = `<pre>${content}</pre>`;
-                                    const htmlFile = createHtmlFile(file.name, htmlContent);
-                                    htmlFiles.push({
-                                        name: `${file.name}.html`,
-                                        content: htmlFile
+                                if (file.name.toLowerCase().endsWith('.zip')) {
+                                    // Handle ZIP file
+                                    const zipFiles = await handleZipFile(file);
+                                    processedFiles.push(...zipFiles);
+                                } else {
+                                    // Handle regular file
+                                    processedFiles.push({
+                                        name: file.name,
+                                        content: e.target.result
                                     });
                                 }
                                 
@@ -489,33 +673,38 @@
                             }
                         };
                         reader.onerror = reject;
-                        reader.readAsText(file);
+                        
+                        if (file.name.toLowerCase().endsWith('.zip')) {
+                            reader.readAsArrayBuffer(file);
+                        } else {
+                            reader.readAsText(file);
+                        }
                     });
                 }
                 
-                // Add HTML files to ZIP
-                htmlFiles.forEach(file => {
-                    zip.file(file.name, file.content);
-                });
+                // Create preview HTML
+                const fileListHtml = createFileListHtml(processedFiles);
+                const previewHtml = createHtmlFile('Uploaded Files', fileListHtml);
                 
-                // Generate ZIP file
-                const zipBlob = await zip.generateAsync({type: 'blob'});
-                const zipUrl = URL.createObjectURL(zipBlob);
+                // Create preview URL
+                const previewBlob = new Blob([previewHtml], { type: 'text/html' });
+                const previewUrl = URL.createObjectURL(previewBlob);
                 
-                // Update UI with download links
+                // Update UI with links
                 const viewLink = document.querySelector('.view-link');
                 const downloadLink = document.querySelector('.download-link');
                 
-                if (htmlFiles.length > 0) {
-                    const firstHtmlFile = htmlFiles[0];
-                    const htmlBlob = new Blob([firstHtmlFile.content], {type: 'text/html'});
-                    const htmlUrl = URL.createObjectURL(htmlBlob);
-                    viewLink.href = htmlUrl;
-                    viewLink.style.display = 'inline-flex';
-                } else {
-                    viewLink.style.display = 'none';
-                }
+                viewLink.href = previewUrl;
+                viewLink.style.display = 'inline-flex';
                 
+                // Create ZIP with all files
+                const zip = new JSZip();
+                processedFiles.forEach(file => {
+                    zip.file(file.name, file.content);
+                });
+                
+                const zipBlob = await zip.generateAsync({ type: 'blob' });
+                const zipUrl = URL.createObjectURL(zipBlob);
                 downloadLink.href = zipUrl;
                 downloadLink.download = 'files.zip';
                 
@@ -523,10 +712,40 @@
                 progressBar.style.display = 'none';
                 uploadResult.style.display = 'block';
                 
+                // Store files in window for preview/download
+                window.uploadedFiles = processedFiles;
+                
             } catch (error) {
                 console.error('Error processing files:', error);
                 alert('Error processing files. Please try again.');
                 progressBar.style.display = 'none';
+            }
+        }
+        
+        // Function to preview a specific file
+        function previewFile(filename) {
+            const file = window.uploadedFiles.find(f => f.name === filename);
+            if (file) {
+                const previewHtml = createHtmlFile(file.name, `<pre>${file.content}</pre>`);
+                const previewBlob = new Blob([previewHtml], { type: 'text/html' });
+                const previewUrl = URL.createObjectURL(previewBlob);
+                window.open(previewUrl, '_blank');
+            }
+        }
+        
+        // Function to download a specific file
+        function downloadFile(filename) {
+            const file = window.uploadedFiles.find(f => f.name === filename);
+            if (file) {
+                const blob = new Blob([file.content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
             }
         }
         
@@ -546,7 +765,7 @@
             });
         }
         
-        // Existing copy link function
+        // Copy link function
         function copyLink(path) {
             const fullUrl = window.location.origin + window.location.pathname.replace('index.html', '') + path;
             navigator.clipboard.writeText(fullUrl).then(() => {
