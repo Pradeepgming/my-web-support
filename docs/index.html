@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>My Web Support - File Hosting</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
             --primary-color: #3498db;
@@ -38,6 +39,30 @@
             text-align: center;
         }
         
+        .upload-section {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .upload-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
         .files-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -52,7 +77,6 @@
             padding: 20px;
             transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
         }
         
         .file-card:hover {
@@ -75,45 +99,47 @@
         .file-info {
             font-size: 0.9em;
             color: #666;
+            margin-bottom: 15px;
         }
         
-        .file-link {
-            text-decoration: none;
-            color: inherit;
-            display: block;
+        .file-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
         }
         
-        .file-link:hover {
-            text-decoration: none;
+        .action-btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: all 0.2s ease;
         }
         
-        .file-size {
-            position: absolute;
-            top: 10px;
-            right: 10px;
+        .view-btn {
             background: var(--primary-color);
             color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
         }
         
-        .file-type {
-            display: inline-block;
-            padding: 2px 8px;
-            background: #e1e4e8;
-            border-radius: 4px;
-            font-size: 0.8em;
-            margin-top: 5px;
+        .download-btn {
+            background: var(--secondary-color);
+            color: white;
         }
         
-        .preview-frame {
-            width: 100%;
-            height: 400px;
-            border: none;
-            border-radius: 8px;
-            margin-top: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        .copy-btn {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .action-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
         }
         
         .preview-section {
@@ -130,6 +156,60 @@
             text-align: center;
         }
         
+        .preview-frame {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 8px;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: white;
+            min-width: 160px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            z-index: 1;
+            right: 0;
+        }
+        
+        .dropdown-content a {
+            color: var(--text-color);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 0.9em;
+        }
+        
+        .dropdown-content a:hover {
+            background: #f8f9fa;
+        }
+        
+        .show {
+            display: block;
+        }
+        
+        .copy-tooltip {
+            position: absolute;
+            background: #34495e;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -138,6 +218,10 @@
             .files-grid {
                 grid-template-columns: 1fr;
             }
+            
+            .file-actions {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -145,38 +229,78 @@
     <div class="container">
         <h1>My Web Support</h1>
         
+        <div class="upload-section">
+            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                <i class="fas fa-cloud-upload-alt"></i> Upload Files
+            </button>
+            <input type="file" id="fileInput" style="display: none" multiple>
+        </div>
+        
         <div class="files-grid">
             <div class="file-card">
-                <a href="files/game.html" class="file-link" target="_blank">
-                    <div class="file-icon">🌐</div>
-                    <div class="file-name">Balloon Prick Game</div>
-                    <div class="file-info">Interactive Game</div>
-                    <div class="file-type">HTML</div>
-                </a>
+                <div class="file-icon">🌐</div>
+                <div class="file-name">Balloon Prick Game</div>
+                <div class="file-info">Interactive HTML5 Game</div>
+                <div class="file-actions">
+                    <button class="action-btn view-btn" onclick="window.open('files/game.html', '_blank')">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                    <button class="action-btn download-btn" onclick="window.location.href='files/game.html'" download>
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                    <button class="action-btn copy-btn" onclick="copyLink('files/game.html')">
+                        <i class="fas fa-link"></i> Copy Link
+                    </button>
+                    <div class="copy-tooltip">Link copied!</div>
+                </div>
             </div>
+            
             <div class="file-card">
-                <a href="files/activity_main.xml" class="file-link" download>
-                    <div class="file-icon">📄</div>
-                    <div class="file-name">activity_main.xml</div>
-                    <div class="file-info">Layout File</div>
-                    <div class="file-type">XML</div>
-                </a>
+                <div class="file-icon">📄</div>
+                <div class="file-name">activity_main.xml</div>
+                <div class="file-info">Android Layout File</div>
+                <div class="file-actions">
+                    <button class="action-btn view-btn" onclick="window.open('files/activity_main.xml', '_blank')">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                    <button class="action-btn download-btn" onclick="window.location.href='files/activity_main.xml'" download>
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                    <button class="action-btn copy-btn" onclick="copyLink('files/activity_main.xml')">
+                        <i class="fas fa-link"></i> Copy Link
+                    </button>
+                </div>
             </div>
+            
             <div class="file-card">
-                <a href="files/MainActivity.java" class="file-link" download>
-                    <div class="file-icon">📄</div>
-                    <div class="file-name">MainActivity.java</div>
-                    <div class="file-info">Source Code</div>
-                    <div class="file-type">JAVA</div>
-                </a>
+                <div class="file-icon">📄</div>
+                <div class="file-name">MainActivity.java</div>
+                <div class="file-info">Android Source Code</div>
+                <div class="file-actions">
+                    <button class="action-btn view-btn" onclick="window.open('files/MainActivity.java', '_blank')">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                    <button class="action-btn download-btn" onclick="window.location.href='files/MainActivity.java'" download>
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                    <button class="action-btn copy-btn" onclick="copyLink('files/MainActivity.java')">
+                        <i class="fas fa-link"></i> Copy Link
+                    </button>
+                </div>
             </div>
+            
             <div class="file-card">
-                <a href="files/game.zip" class="file-link" download>
-                    <div class="file-icon">📦</div>
-                    <div class="file-name">Complete Package</div>
-                    <div class="file-info">All Files</div>
-                    <div class="file-type">ZIP</div>
-                </a>
+                <div class="file-icon">📦</div>
+                <div class="file-name">Complete Package</div>
+                <div class="file-info">All Game Files (ZIP)</div>
+                <div class="file-actions">
+                    <button class="action-btn download-btn" onclick="window.location.href='files/game.zip'" download>
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                    <button class="action-btn copy-btn" onclick="copyLink('files/game.zip')">
+                        <i class="fas fa-link"></i> Copy Link
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -190,15 +314,30 @@
     </div>
     
     <script>
-        // Add click handlers for files
-        document.querySelectorAll('.file-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                const ext = this.href.split('.').pop().toLowerCase();
-                // For binary files, download instead of opening
-                if (!['html', 'htm', 'txt', 'md', 'css', 'js'].includes(ext)) {
-                    this.download = this.href.split('/').pop();
-                }
+        function copyLink(path) {
+            const fullUrl = window.location.origin + window.location.pathname.replace('index.html', '') + path;
+            navigator.clipboard.writeText(fullUrl).then(() => {
+                const btn = event.target.closest('.copy-btn');
+                const tooltip = btn.parentElement.querySelector('.copy-tooltip');
+                tooltip.style.display = 'block';
+                setTimeout(() => {
+                    tooltip.style.display = 'none';
+                }, 2000);
             });
+        }
+        
+        // File upload handling
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                const formData = new FormData();
+                for (let file of files) {
+                    formData.append('files[]', file);
+                }
+                
+                // You can implement the upload functionality here
+                alert('Upload feature will be implemented soon!');
+            }
         });
     </script>
 </body>
